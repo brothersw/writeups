@@ -1,0 +1,89 @@
+Wizardlike was a problem where they gave you a simple game to somehow reverse.
+This game was text based and had multiple solutions avaliable.
+Depicted is my problem analysis and solution.
++-----------+
+|Description|
++-----------+
+Author: LT 'syreal' Jones
+
+Do you seek your destiny in these deplorable dungeons? 
+If so, you may want to look elsewhere. Many have gone before you and honestly, they've cleared out the place of all monsters, ne'erdowells, bandits and every other sort of evil foe. 
+The dungeons themselves have seen better days too. 
+There's a lot of missing floors and key passages blocked off. 
+You'd have to be a real wizard to make any progress in this sorry excuse for a dungeon! Download the game. 'w', 'a', 's', 'd' moves your character and 'Q' quits. 
+You'll need to improvise some wizardly abilities to find the flag in this dungeon crawl. '.' is floor, '#' are walls, '<' are stairs up to previous level, and '>' are stairs down to next level.
+
+Hints
+1) Different tools are better at different things. Ghidra is awesome at static analysis, but radare2 is amazing at debugging.
+2) With the right focus and preparation, you can teleport to anywhere on the map.
+
++------------------+
+|Initial evaluation|
++------------------+
+The hints seem to point to manipulating the character's position with a dynamic analysis tool such as radare2. I like to start off with a quick static analysis first to determine what generally will happen, and how the problem will work. My goto tool for this is Ghidra.
+
+Running the game shows a level that you can move around in, and some sort of sight mechanic that obscures what isn't within your player's line of sight.
+The first level, with what the player can see at this moment.
+#########
+#......@#  ......#   .....................
+#.......#  .............
+#........  .#
+#.......#  .#
+#.......#  .#
+#.......#  .#
+#.......#  .#
+#.......#  ..
+#.......#
+#.......#
+#.......#
+#.......#
+#.......#
+#......>#
+#########
+
+Looking at the game in Ghidra, you can see the control function begin at 0x0010185b. It shows some sort of call where it pushes in a string that the start of it looks suspiciously like the first line of the text-based levels, and then some more characters. 
+"s_#########_#.......#_......#....._"
+It pushes these strings into the function at 0x00101291. 
+The second level also seems to correlate, starting the string off with "s_#####"
+
+Once can deduce that this is how the levels are stored within the game, so lets try and take a closer look at them, without whatever gets ovscured by this vision mechanic.
+
++------------------------+
+|The reversing the levels|
++------------------------+
+There is no reason to attempt to teleport throughout the game to uncover the full level with a tool such as radare2 if the full levels are just stored within the program unobscured. 
+Just dumping the strings within the binary with the command "strings game", can provide some more insight into how the game stores its levels. 
+The command returns strings of #'s and .'s which look like: 
+#########                                                                                           #.......#  ......#...................................                                               #.......#  ....................####.#####.#####..###.                                               #........  .####.#..###..###..#.......#...#......#...                                               #.......#  .#  #.#.#....#   #.#.......#...###...#....                                               #.......#  .####.#.#....#   #.#.......#...#......#...                                               #.......#  .#....#..###..###...####...#...#......###.                                               #.......#  .#........................................                                               #.......#  ..........................................                                               #.......#                                                                                           #.......#                                                                                           #.......#                                                                                           #.......#                                                                                           #.......#                                                                                           #......>#                                                                                           #########
+Already this string begins to look supiciously like the first level with a vertical hallway that looks like "#.......#" repeating. 
+So, lets try and line up the "#.......#" segments in this string and see if it does anything. 
+
+#########                                                                                           
+#.......#  ......#...................................                                               
+#.......#  ....................####.#####.#####..###.                                               
+#........  .####.#..###..###..#.......#...#......#...                                               
+#.......#  .#  #.#.#....#   #.#.......#...###...#....                                               
+#.......#  .####.#.#....#   #.#.......#...#......#...                                               
+#.......#  .#....#..###..###...####...#...#......###.                                               
+#.......#  .#........................................                                               
+#.......#  ..........................................                                               
+#.......#                                                                                           
+#.......#                                                                                           
+#.......#                                                                                           
+#.......#                                                                                           
+#.......#                                                                                           
+#......>#                                                                                           
+#########                                                                                           
+This looks amazing! You can make out picoCTF{ in the level design already, so presumably the other levels have the rest of the text! 
+This level also seems to be 100 characers wide, so trying to line up the other levels with this width may prove useful. Go to the next block of characters like this that were returned from the strings command, and try what we just did.
+#####. .............................................................                                #.<.#. ...............#..#.............##.......#..#........#.......                                #...#. .#..#.###......#..#.......#...#..#.####..#..#.###....#.......                                #...#. .#..#.#........####.......#.#.#..#...#...####.#...####.......                                #...#. .####.#...####....#.#####..#.#..###.####....#.#...####.#####.                                  .    .............................................................                                  .    .............................................................                                  .    .............................................................                                #....                                                                                               #...#                                                                                               #...#                                                                                               #...#                                                                                               #...#                                                                                               #...#                                                                                               #.>.#                                                                                               #####
+#####. .............................................................                                
+#.<.#. ...............#..#.............##.......#..#........#.......                                
+#...#. .#..#.###......#..#.......#...#..#.####..#..#.###....#.......                                
+#...#. .#..#.#........####.......#.#.#..#...#...####.#...####.......                                
+#...#. .####.#...####....#.#####..#.#..###.####....#.#...####.#####.                                
+(unecessary continuation of the rest of the level)
+
+Now, we know we are on the correct track and on the way to getting the solution! 
+We uncovered more characters of the flag for level 2 "ur_4_w1z4rd_"! 
+We can just repeat the sequence of actions that just happened to retrieve the complete flag.
