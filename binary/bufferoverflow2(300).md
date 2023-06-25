@@ -9,7 +9,6 @@ Hints
 
 **Tools**
 This writeup is a large continuation of [buffer overflow 1](./binary/bufferoverflow1(200).md).
-This is **highly** recomended to view first
 Please see this writeup if you don't understand the leadup to this point.
 
 In this writeup and subsequent binary exploitation writeups, I will be using the tools [Ghidra](https://github.com/NationalSecurityAgency/ghidra), [GDB](https://en.wikipedia.org/wiki/GNU_Debugger), and an extension for GDB called [pwndbg](https://github.com/pwndbg/pwndbg).
