@@ -200,13 +200,15 @@ def main():
 
 This leads to the following graph with character count on the x-axis and instruction number on the y-axis:
 
-![[character count side channel.png]]
+![character count side channel](https://github.com/brothersw/writeups/assets/59877252/1e4c1cc8-64f6-4c64-a959-9e7a50bc79a5)
+
 
 This graph shows that characters are grouped and processed into chunks of 8, and there are either 7 or 8 of these chunks.
 
 Looking for a completed block starting with the 7 characters ``hitcon{`` leads to this graph:
 
-![[hitcon{r side channel.png]]
+![hitcon{r side channel](https://github.com/brothersw/writeups/assets/59877252/274566be-ee57-45e7-92f0-fe9d1ff8f272)
+
 
 This means that the first chunk is ``hitcon{r``
 Doing further side channel analysis leads to the conclusion that instruction count jumps by a significant margin only on a solved chunk, not on individual solved characters. This rules out a brute force approach as brute forcing 8 characters at once in a vm isn't feasable.
