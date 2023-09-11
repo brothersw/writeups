@@ -81,7 +81,7 @@ def getBignum() -> int:
 					ret = ord(char)
 					return -ret
 				
-				if ord("$") < ord(char) and (char - 48) < 10:
+				if ord("$") < ord(char) and (ord(char) - 48) < 10:
 					ret = ord(char) - 0x30
 					char = getChar()
 					
