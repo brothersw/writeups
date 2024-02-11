@@ -1,1 +1,1 @@
-A repository of writeups written by me.
+A repository of CTF competition writeups written by me.
